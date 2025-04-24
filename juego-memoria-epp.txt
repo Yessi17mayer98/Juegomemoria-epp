@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Memoria EPP del Soldador</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f0f0f0;
+    }
+    h1 {
+      color: #333;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 100px);
+      gap: 10px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    .card {
+      width: 100px;
+      height: 100px;
+      background-color: #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 14px;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    }
+    .card.matched {
+      background-color: #4CAF50;
+      color: white;
+      cursor: default;
+    }
+  </style>
+</head>
+<body>
+  <h1>Juego de Memoria: EPP del Soldador</h1>
+  <div class="grid" id="game-board"></div>
+  <p id="message"></p>
+
+  <script>
+    const items = [
+      "Máscara de soldar", "Guantes de cuero", "Mandil de cuero",
+      "Botas con punta de acero", "Gafas de seguridad", "Protección auditiva"
+    ];
+
+    const cards = [...items, ...items].sort(() => 0.5 - Math.random());
+    const board = document.getElementById("game-board");
+    const message = document.getElementById("message");
+    let firstCard = null;
+    let lockBoard = false;
+    let matches = 0;
+
+    function createCard(content, index) {
+      const card = document.createElement("div");
+      card.classList.add("card");
+      card.dataset.index = index;
+      card.dataset.value = content;
+      card.innerText = "?";
+      card.addEventListener("click", () => flipCard(card));
+      board.appendChild(card);
+    }
+
+    function flipCard(card) {
+      if (lockBoard || card.classList.contains("matched") || card.innerText !== "?") return;
+
+      card.innerText = card.dataset.value;
+
+      if (!firstCard) {
+        firstCard = card;
+        return;
+      }
+
+      if (firstCard.dataset.value === card.dataset.value && firstCard !== card) {
+        firstCard.classList.add("matched");
+        card.classList.add("matched");
+        matches++;
+        if (matches === items.length) {
+          message.innerText = "¡Felicidades! Has aprendido sobre los EPP del soldador.";
+        }
+        firstCard = null;
+      } else {
+        lockBoard = true;
+        setTimeout(() => {
+          card.innerText = "?";
+          firstCard.innerText = "?";
+          firstCard = null;
+          lockBoard = false;
+        }, 1000);
+      }
+    }
+
+    cards.forEach((item, index) => createCard(item, index));
+  </script>
+</body>
+</html>
